@@ -108,6 +108,8 @@ class DataProcessor:
             raise ValueError("Number of rows in tabular_data and new_columns must be the same.")
 
         # Concatenate tabular_data and new_columns along axis 1 (columns)
-        result_data = pd.concat([tabular_data, new_columns], axis=1)
+        result_data = pd.concat([tabular_data.reset_index(drop=True), new_columns.reset_index(drop=True)], axis=1)
+
+        assert tabular_data.shape[0] == result_data.shape[0]
 
         return result_data

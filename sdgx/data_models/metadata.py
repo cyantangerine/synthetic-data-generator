@@ -23,6 +23,9 @@ class CategoricalEncoderType(StrValuedBaseEnum):
     LABEL = "label"
     FREQUENCY = "frequency"
 
+class ContinuousEncoderType(StrValuedBaseEnum):
+    GMM = "gmm"
+    NONE = "none"
 
 class Metadata(BaseModel):
     """
@@ -82,6 +85,7 @@ class Metadata(BaseModel):
     datetime_format: Dict = defaultdict(str)
     numeric_format: Dict = defaultdict(list)
 
+    continuous_encoder: Dict[str, ContinuousEncoderType] = defaultdict(str)
     # def columns encoder, even not matched categorical_threshold.
     categorical_encoder: Union[Dict[str, CategoricalEncoderType], None] = defaultdict(str)
     # if greater than categorical_threshold, encoder is the mapped.
@@ -677,6 +681,6 @@ class Metadata(BaseModel):
         to_remove_attribute.extend(list(self.format_fields))
         for attr in to_remove_attribute:
             do_remove_columns(attr)
-        for attr in ["column_list", "primary_keys"]:
+        for attr in ["column_list", "primary_keys", "categorical_encoder"]:
             do_remove_columns(attr, False)
         self.check()

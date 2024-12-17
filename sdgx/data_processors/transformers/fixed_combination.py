@@ -237,6 +237,8 @@ class FixedCombinationTransformer(Transformer):
             # define a function to replace base_col and related_col
             def replace_row(row):
                 base_val = row[base_col]
+                if isinstance(base_val, pd.Series):
+                    base_val = base_val.values[0]
                 if base_val in mapping:
                     new_related_val = mapping[base_val]
                     return pd.Series({base_col: base_val, related_col: new_related_val})

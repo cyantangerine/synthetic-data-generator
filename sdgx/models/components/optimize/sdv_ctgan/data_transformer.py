@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import CategoricalEncoderType, Metadata
+from sdgx.data_models.metadata import CategoricalEncoderType, Metadata, ContinuousEncoderType
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.types import (
     ActivationFuncType,
@@ -24,6 +24,7 @@ from sdgx.models.components.sdv_rdt.transformers import (
     NormalizedLabelEncoder,
     OneHotEncoder,
 )
+from sdgx.models.components.sdv_rdt.transformers.numerical import DirectNormalizer
 from sdgx.utils import logger
 
 CategoricalEncoderParams = NamedTuple(
@@ -94,16 +95,39 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
-        gm.fit(data, column_name)
-        num_components = sum(gm.valid_component_indicator)
+        encoder_type = None
+        if self.metadata is None or not self.metadata.continuous_encoder:
+            encoder_type = ContinuousEncoderType.GMM
+        else:
+            if column_name in self.metadata.continuous_encoder:
+                encoder_type = self.metadata.continuous_encoder[column_name]
+            else:
+                encoder_type = ContinuousEncoderType.GMM
+
+        num_components = None
+        output_dim = None
+        output_info = []
+        if encoder_type == ContinuousEncoderType.GMM:
+            encoder = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
+            encoder.fit(data, column_name)
+            num_components = sum(encoder.valid_component_indicator)
+            output_info = [SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")]
+            output_dim = num_components + 1
+        elif encoder_type == ContinuousEncoderType.NONE:
+            encoder = DirectNormalizer()
+            encoder.fit(data, column_name)
+            num_components = 1
+            output_dim = 1
+            output_info = [SpanInfo(1, "linear")]
+        else:
+            raise Exception(f"Unknown encoder type {encoder_type} for column {column_name}.")
 
         return ColumnTransformInfo(
             column_name=column_name,
             column_type="continuous",
-            transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],
-            output_dimensions=1 + num_components,
+            transform=encoder,
+            output_info=output_info,
+            output_dimensions=output_dim,
         )
 
     def _fit_discrete(self, data, encoder_type: CategoricalEncoderType = None):
@@ -199,8 +223,9 @@ class DataTransformer(object):
         #  but the lable encoded column (ending in '.component') is one hot encoded.
         output = np.zeros((len(transformed), column_transform_info.output_dimensions))
         output[:, 0] = transformed[f"{column_name}.normalized"].to_numpy()
-        index = transformed[f"{column_name}.component"].to_numpy().astype(int)
-        output[np.arange(index.size), index + 1] = 1.0
+        if isinstance(gm, ClusterBasedNormalizer):
+            index = transformed[f"{column_name}.component"].to_numpy().astype(int)
+            output[np.arange(index.size), index + 1] = 1.0
 
         return output
 
@@ -264,19 +289,21 @@ class DataTransformer(object):
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
-        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
-        data = data.astype(float)
-        data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
-        if sigmas is not None:
-            selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
-            data.iloc[:, 0] = selected_normalized_value
-
+        if isinstance(gm, ClusterBasedNormalizer):
+            data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
+            data = data.astype(float)
+            data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
+            if sigmas is not None:
+                selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
+                data.iloc[:, 0] = selected_normalized_value
+        else:
+            data = pd.DataFrame(column_data[:, 0], columns=list(gm.get_output_sdtypes()))
         return gm.reverse_transform(data)
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
-        ohe = column_transform_info.transform
-        data = pd.DataFrame(column_data, columns=list(ohe.get_output_sdtypes()))
-        return ohe.reverse_transform(data)[column_transform_info.column_name]
+        encoder = column_transform_info.transform
+        data = pd.DataFrame(column_data, columns=list(encoder.get_output_sdtypes()))
+        return encoder.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):
         """Take matrix data and output raw data.

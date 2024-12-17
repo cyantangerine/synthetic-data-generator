@@ -59,8 +59,11 @@ class EmailGenerator(PIIGenerator):
         for each_col_name in self.email_columns_list:
             each_email_col = [fake.ascii_company_email() for _ in range(df_length)]
             each_email_df = pd.DataFrame({each_col_name: each_email_col})
-            processed_data = self.attach_columns(processed_data, each_email_df)
-
+            if each_col_name not in processed_data.columns:
+                processed_data = self.attach_columns(processed_data, each_email_df)
+            else:
+                processed_data[each_col_name] = each_email_col
+        # TODO 不要迭代concat
         return processed_data
 
 

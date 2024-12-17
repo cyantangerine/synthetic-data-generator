@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import scipy
 from sklearn.mixture import BayesianGaussianMixture
+from sklearn.preprocessing import StandardScaler
 
 from sdgx.models.components.sdv_rdt.transformers.base import BaseTransformer
 from sdgx.models.components.sdv_rdt.transformers.null import NullTransformer
@@ -540,6 +541,99 @@ class ClusterBasedNormalizer(FloatFormatter):
 
         return reversed_data
 
+    def _reverse_transform(self, data):
+        """Convert data back into the original format.
+
+        Args:
+            data (pd.DataFrame or numpy.ndarray):
+                Data to transform.
+
+        Returns:
+            pandas.Series.
+        """
+        if not isinstance(data, np.ndarray):
+            data = data.to_numpy()
+
+        recovered_data = self._reverse_transform_helper(data)
+        if self.null_transformer and self.null_transformer.models_missing_values():
+            data = np.stack([recovered_data, data[:, -1]], axis=1)  # noqa: PD013
+        else:
+            data = recovered_data
+
+        return super()._reverse_transform(data)
+
+
+class DirectNormalizer(FloatFormatter):
+
+    STD_MULTIPLIER = 4
+    DETERMINISTIC_TRANSFORM = False
+    DETERMINISTIC_REVERSE = True
+    COMPOSITION_IS_IDENTITY = False
+
+    _bgm_transformer = None
+    valid_component_indicator = None
+
+    def __init__(
+        self,
+        model_missing_values=False,
+        learn_rounding_scheme=False,
+        enforce_min_max_values=False
+    ):
+        super().__init__(
+            missing_value_replacement="mean",
+            model_missing_values=model_missing_values,
+            learn_rounding_scheme=learn_rounding_scheme,
+            enforce_min_max_values=enforce_min_max_values,
+        )
+
+    def get_output_sdtypes(self):
+        """Return the output sdtypes supported by the transformer.
+
+        Returns:
+            dict:
+                Mapping from the transformed column names to supported sdtypes.
+        """
+        output_sdtypes = {"normalized": "float"}
+        if self.null_transformer and self.null_transformer.models_missing_values():
+            output_sdtypes["is_null"] = "float"
+
+        return self._add_prefix(output_sdtypes)
+
+    def _fit(self, data):
+        """Fit the transformer to the data.
+
+        Args:
+            data (pandas.Series):
+                Data to fit to.
+        """
+        self._bgm_transformer = StandardScaler()
+        super()._fit(data)
+        data = super()._transform(data)
+        if data.ndim > 1:
+            data = data[:, 0]
+        self._bgm_transformer.fit(pd.DataFrame(data))
+    def _transform(self, data):
+        """Transform the numerical data.
+
+        Args:
+            data (pandas.Series):
+                Data to transform.
+
+        Returns:
+            numpy.ndarray.
+        """
+        data = super()._transform(data)
+        if data.ndim > 1:
+            data, model_missing_values = data[:, 0], data[:, 1]
+
+        tr: StandardScaler = self._bgm_transformer
+        data = tr.transform(pd.DataFrame(data))
+        return data
+
+    def _reverse_transform_helper(self, data):
+        tr: StandardScaler = self._bgm_transformer
+        data = tr.inverse_transform(pd.DataFrame(data))
+        return data.reshape(-1)
     def _reverse_transform(self, data):
         """Convert data back into the original format.
 

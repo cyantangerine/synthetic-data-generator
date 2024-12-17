@@ -73,7 +73,7 @@ class DatetimeFormatter(Formatter):
             if each_col in self.datetime_formats.keys():
                 datetime_columns.append(each_col)
             else:
-                dead_columns.append(each_col)
+                # dead_columns.append(each_col)
                 logger.warning(
                     f"Column {each_col} has no datetime_format, DatetimeFormatter will REMOVE this column！"
                 )
