@@ -24,7 +24,7 @@ class DiscreteInspector(Inspector):
         self.discrete_columns = set()
 
         self.discrete_columns = self.discrete_columns.union(
-            set(raw_data.select_dtypes(include="object").columns)
+            set(raw_data.select_dtypes(include=["object", "category"]).columns)
         )
         self.ready = True
 

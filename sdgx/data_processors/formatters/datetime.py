@@ -131,6 +131,9 @@ class DatetimeFormatter(Formatter):
         Returns:
             - result_data (pd.DataFrame): Processed table data with datetime columns converted to timestamp
         """
+        
+        # escape flooding to log
+        report_warnings = []
 
         def datetime_formatter(each_value, datetime_format):
             """
@@ -140,11 +143,8 @@ class DatetimeFormatter(Formatter):
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
                 each_stamp = datetime.timestamp(datetime_obj)
             except Exception as e:
-                logger.warning(
-                    f"An error occured when convert str to timestamp {e}, we set as mean."
-                )
-                logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
-                logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
+                if len(report_warnings) <= 10:
+                    report_warnings.append((e, each_value))
                 each_stamp = np.nan
             return each_stamp
 
@@ -154,10 +154,15 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
+            report_warnings = []
             result_data[column] = result_data[column].apply(
                 datetime_formatter, datetime_format=datetime_formats[column]
             )
-            result_data[column].fillna(result_data[column].mean(), inplace=True)
+            if report_warnings:
+                logger.warning(
+                    f"Some errors occured when convert str to timestamp in column ({column}), format ({datetime_formats[column]}), we set as mean. Such as:\nValue\tValueType\tError\n" + "\n".join(["\t".join((str(v), type(v).__name__, str(e))) for e, v in report_warnings])
+                )
+            result_data.fillna({column: result_data[column].mean()}, inplace=True)
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
@@ -204,7 +209,7 @@ class DatetimeFormatter(Formatter):
             try:
                 each_str = datetime.fromtimestamp(each_stamp).strftime(timestamp_format)
             except Exception as e:
-                logger.debug(f"An error occured when convert timestamp to str {e}.")
+                logger.warning(f"An error occured when convert timestamp to str {e}.")
                 each_str = "No Datetime"
             return each_str
 

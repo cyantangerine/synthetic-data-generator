@@ -25,6 +25,14 @@ class DataConnector:
         """
         raise NotImplementedError
 
+    def _dtypes(self) -> list[str]:
+        """
+        Subclass should implement this for reading dtypes if there is an efficient way for peaking dtypes.
+
+        See ``dtypes`` for more details.
+        """
+        raise NotImplementedError
+    
     def _columns(self) -> list[str]:
         """
         Subclass should implement this for reading columns if there is an efficient way for peaking columns.
@@ -77,6 +85,15 @@ class DataConnector:
         except NotImplementedError:
             return self.read(0, 1).columns.tolist()
 
+    def dtypes(self) -> pd.Series:
+        """
+        Interface for peaking dtypes.
+        """
+        try:
+            return self._dtypes()
+        except NotImplementedError:
+            return self.read(0, 1).dtypes
+    
     def keys(self) -> list[str]:
         """
         Same as ``columns``.

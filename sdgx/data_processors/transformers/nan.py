@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
-
+import pandas as pd
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -41,12 +41,12 @@ class NonValueTransformer(Transformer):
 
     fill_na_value_int: int
     """
-    The value to fill missing integer values with. Default is 0.
+    The value to fill missing integer values with. Default is mean of column.
     """
 
     fill_na_value_float: float
     """
-    The value to fill missing float values with. Default is 0.0.
+    The value to fill missing float values with. Default is mean of column.
     """
 
     fill_na_value_default: str
@@ -68,8 +68,8 @@ class NonValueTransformer(Transformer):
         self.int_columns = set()
         self.float_columns = set()
         self.column_list = []
-        self.fill_na_value_int = 0
-        self.fill_na_value_float = 0.0
+        self.fill_na_value_int = "mean" # 0
+        self.fill_na_value_float = "mean" # 0.0
         self.fill_na_value_default = "NAN_VALUE"
         self.drop_na = False
 
@@ -127,14 +127,21 @@ class NonValueTransformer(Transformer):
 
         # fill numeric nan value
         for each_col in self.int_columns:
-            res[each_col] = res[each_col].fillna(self.fill_na_value_int)
+            res[each_col] = res[each_col].fillna(res[each_col].mean() if self.fill_na_value_int == "mean" else self.fill_na_value_int)
         for each_col in self.float_columns:
-            res[each_col] = res[each_col].fillna(self.fill_na_value_float)
+            res[each_col] = res[each_col].fillna(res[each_col].mean() if self.fill_na_value_float == "mean" else self.fill_na_value_float)
 
         # fill other non-numeric nan value
         for each_col in self.column_list:
             if each_col in self.int_columns or each_col in self.float_columns:
                 continue
+            
+            # 检查该列是否为 'Categorical' 类型，并将 'NAN_VALUE' 添加到类别中
+            if isinstance(res[each_col].dtype, pd.CategoricalDtype):
+                # 如果 'NAN_VALUE' 不在类别中，则添加它
+                if self.fill_na_value_default not in res[each_col].cat.categories:
+                    res[each_col] = res[each_col].cat.add_categories(self.fill_na_value_default)
+            
             res[each_col] = res[each_col].fillna(self.fill_na_value_default)
 
         logger.info("Converting data using NonValueTransformer... Finished.")

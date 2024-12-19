@@ -357,6 +357,7 @@ class Metadata(BaseModel):
 
         metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
         for inspector in inspectors:
+            
             inspect_res = inspector.inspect()
             # update column type
             metadata.update(inspect_res)
@@ -368,10 +369,16 @@ class Metadata(BaseModel):
             for each_key in inspect_res:
                 if "columns" in each_key:
                     metadata.column_inspect_level[each_key] = inspector.inspect_level
+            logger.debug(f"Inspected by {inspector.__class__}: {inspect_res}")
 
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
 
+        all_dtype_columns = metadata.get_all_data_type_columns()
+        missing_cols = set(metadata.column_list) - set(all_dtype_columns)
+        if missing_cols:
+            logger.warning(f"Some columns' data type can't be specified by Inspector automatically: {missing_cols}\nHere are some infomation to decide manually:\n{dataloader.dtypes().loc[missing_cols]}")
+        
         if check:
             metadata.check()
         return metadata
@@ -421,7 +428,11 @@ class Metadata(BaseModel):
             for each_key in inspect_res:
                 if "columns" in each_key:
                     metadata.column_inspect_level[each_key] = inspector.inspect_level
-
+        
+        all_dtype_columns = metadata.get_all_data_type_columns()
+        missing_cols = set(metadata.column_list) - set(all_dtype_columns)
+        if missing_cols:
+            logger.warning(f"Some columns' data type can't be specified by Inspector automatically: {missing_cols}")
         if check:
             metadata.check()
         return metadata

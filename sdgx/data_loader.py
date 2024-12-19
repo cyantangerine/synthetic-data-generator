@@ -128,6 +128,15 @@ class DataLoader:
                 raise DataLoaderInitError("NoCache can't be used with GeneratorConnector")
             # Warmup cache for generator, this allows random access
             self.load_all()
+            
+    def dtypes(self) -> pd.Series:
+        """
+        Peak dtypes.
+
+        Returns:
+            pd.Series: dtypes of columns
+        """
+        return self.data_connector.dtypes()
 
     def iter(self) -> Generator[pd.DataFrame, None, None]:
         """

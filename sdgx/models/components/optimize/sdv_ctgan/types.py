@@ -37,6 +37,9 @@ class SpanInfo:
     def __init__(self, dim: int, activation_fn: ActivationFuncType | str):
         self.dim: int = dim
         self.activation_fn: ActivationFuncType = ActivationFuncType(activation_fn)
+    def __str__(self):
+        return str((self.dim, self.activation_fn))
+    __repr__ = __str__
 
 
 class ColumnTransformInfo:
@@ -53,3 +56,11 @@ class ColumnTransformInfo:
         self.transform: TransformerEncoderInstanceType = transform
         self.output_info: List[SpanInfo] = output_info
         self.output_dimensions: int = output_dimensions
+    def to_str_log(self):
+        return "\t".join(map(str, {
+            "column_type": self.column_type,
+            "transform": str(self.transform.__class__.__name__),
+            "output_dimensions": self.output_dimensions,
+            "column_name": self.column_name,
+            "output_info": str(self.output_info)
+        }.values()))

@@ -70,7 +70,7 @@ class DatetimeInspector(Inspector):
 
         # for some other case
         # Some columns containing dates after infer are still marked as object
-        candidate_columns = set(raw_data.select_dtypes(include=["object"]).columns)
+        candidate_columns = set(raw_data.select_dtypes(include=["object", "category"]).columns)
         for col_name in candidate_columns:
             each_col = raw_data[col_name]
             if DatetimeInspector.can_convert_to_datetime(each_col):
@@ -123,7 +123,7 @@ class DatetimeInspector(Inspector):
 
         return {
             "datetime_columns": list(self.datetime_columns),
-            "datetime_formats": self.column_formats,
+            "datetime_format": self.column_formats,
         }
 
 

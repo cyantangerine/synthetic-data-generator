@@ -46,6 +46,9 @@ class DataFrameConnector(DataConnector):
 
     def _columns(self) -> list[str]:
         return list(self.df.columns)
+    
+    def _dtypes(self):
+        return self.df.dtypes.copy()
 
     def _iter(self, offset=0, chunksize=0) -> Generator[pd.DataFrame, None, None]:
         def generator() -> Generator[pd.DataFrame, None, None]:
