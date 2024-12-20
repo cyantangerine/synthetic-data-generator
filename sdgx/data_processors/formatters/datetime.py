@@ -7,11 +7,13 @@ from typing import Any, Dict
 import numpy as np
 import pandas as pd
 
+from sdgx.exceptions import MetadataInvalidError
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
 from sdgx.data_processors.formatters.base import Formatter
 from sdgx.utils import logger
 
+MAX_DATETIME_TIMESTAMP = 2**31 - 1
 
 class DatetimeFormatter(Formatter):
     """
@@ -131,9 +133,6 @@ class DatetimeFormatter(Formatter):
         Returns:
             - result_data (pd.DataFrame): Processed table data with datetime columns converted to timestamp
         """
-        
-        # escape flooding to log
-        report_warnings = {}
 
         def datetime_formatter(each_value, datetime_format):
             """
@@ -158,7 +157,7 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
-            report_warnings = {}
+            report_warnings = {} # to escape flooding to log
             result_data[column] = result_data[column].apply(
                 datetime_formatter, datetime_format=datetime_formats[column]
             )
@@ -169,6 +168,8 @@ class DatetimeFormatter(Formatter):
                                 for (tv, v), (e, c) in report_warnings.items()
                         ])
                 )
+            if result_data[column].isnull().all():
+                raise MetadataInvalidError(f"The {column=} are full of NaN, seems it's format is error. You may need to check the log and change it.")
             result_data.fillna({column: result_data[column].mean()}, inplace=True)
         return result_data
 
@@ -211,13 +212,25 @@ class DatetimeFormatter(Formatter):
         TODO:
             if the value <0, the result will be `No Datetime`, try to fix it.
         """
-
+        TIMESTAMP_ERROR_REPLACE = "No Datetime"
+        
+        
         def column_timestamp_formatter(each_stamp: int, timestamp_format: str) -> str:
             try:
                 each_str = datetime.fromtimestamp(each_stamp).strftime(timestamp_format)
             except Exception as e:
-                logger.warning(f"An error occured when convert timestamp to str {e}.")
-                each_str = "No Datetime"
+                # logger.warning(f"An error occured when convert timestamp to str {e}.")
+                t = str(each_stamp)
+                if isinstance(each_stamp, int):            
+                    if each_stamp < 0: t="Lower 0"
+                    elif each_stamp > MAX_DATETIME_TIMESTAMP: t="Exceed"
+                
+                k = (type(each_stamp).__name__, t)
+                if len(report_warnings) <= 10 and k not in report_warnings:
+                    report_warnings[k] = [e, 1, each_stamp]
+                elif k in report_warnings:
+                    report_warnings[k][1] += 1 
+                each_str = TIMESTAMP_ERROR_REPLACE
             return each_str
 
         # Copy the processed data to result_data
@@ -228,9 +241,19 @@ class DatetimeFormatter(Formatter):
             # Check if the column is in the DataFrame
             if column in result_data.columns:
                 # Convert the timestamp to datetime format using the format provided in datetime_column_dict
+                report_warnings = {}
                 result_data[column] = result_data[column].apply(
                     column_timestamp_formatter, timestamp_format=format_dict[column]
                 )
+                if report_warnings:
+                    logger.warning(
+                    f"Some errors occured when convert str to timestamp in column ({column}), format ({format_dict[column]}), we set as '{TIMESTAMP_ERROR_REPLACE}'. Such as:\nValueCount\tValueType\tValue\tError\n" + "\n".join([
+                            "\t".join((str(c), tv, v (t), str(e))) 
+                                for (tv, v), (e, c, t) in report_warnings.items()
+                        ])
+                )
+                if (result_data[column]==TIMESTAMP_ERROR_REPLACE).all():
+                    logger.error(f"The {column=} are full of {TIMESTAMP_ERROR_REPLACE=}. The column's data is not feasible. May some errors occered which were not catched. Issues to github [https://github.com/hitsz-ids/synthetic-data-generator] is welcomed.")
             else:
                 logger.error(f"Column {column} not in processed data's column list!")
 
