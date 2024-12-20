@@ -211,9 +211,9 @@ class DataTransformer(object):
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
             self._column_transform_info_list.append(column_transform_info)
-        if USER_DEFINED_LOG_LEVEL == 'DEBUG':
+        if USER_DEFINED_LOG_LEVEL == 'INFO' or USER_DEFINED_LOG_LEVEL == 'DEBUG':
             log_data = [item.to_str_log() for item in self._column_transform_info_list]
-            logger.debug(f"Transform fit result:\n" + '\n'.join(log_data))
+            logger.info(f"Transform fit result:\n" + '\n'.join(log_data))
 
     def _transform_continuous(self, column_transform_info, data):
         logger.debug(f"Transforming continuous column {column_transform_info.column_name}...")

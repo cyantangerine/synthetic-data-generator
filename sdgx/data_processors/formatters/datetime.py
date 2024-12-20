@@ -133,7 +133,7 @@ class DatetimeFormatter(Formatter):
         """
         
         # escape flooding to log
-        report_warnings = []
+        report_warnings = {}
 
         def datetime_formatter(each_value, datetime_format):
             """
@@ -143,8 +143,12 @@ class DatetimeFormatter(Formatter):
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
                 each_stamp = datetime.timestamp(datetime_obj)
             except Exception as e:
-                if len(report_warnings) <= 10:
-                    report_warnings.append((e, each_value))
+                k = (type(each_value).__name__, str(each_value))
+                if len(report_warnings) <= 10 and k not in report_warnings:
+                    report_warnings[k] = [e, 1]
+                elif k in report_warnings:
+                    report_warnings[k][1] += 1                
+                
                 each_stamp = np.nan
             return each_stamp
 
@@ -154,13 +158,16 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
-            report_warnings = []
+            report_warnings = {}
             result_data[column] = result_data[column].apply(
                 datetime_formatter, datetime_format=datetime_formats[column]
             )
             if report_warnings:
                 logger.warning(
-                    f"Some errors occured when convert str to timestamp in column ({column}), format ({datetime_formats[column]}), we set as mean. Such as:\nValue\tValueType\tError\n" + "\n".join(["\t".join((str(v), type(v).__name__, str(e))) for e, v in report_warnings])
+                    f"Some errors occured when convert str to timestamp in column ({column}), format ({datetime_formats[column]}), we set as mean. Such as:\nValueCount\tValueType\tValue\tError\n" + "\n".join([
+                            "\t".join((str(c), tv, v, str(e))) 
+                                for (tv, v), (e, c) in report_warnings.items()
+                        ])
                 )
             result_data.fillna({column: result_data[column].mean()}, inplace=True)
         return result_data
