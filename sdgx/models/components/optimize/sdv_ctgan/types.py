@@ -64,3 +64,8 @@ class ColumnTransformInfo:
             "column_name": self.column_name,
             "output_info": str(self.output_info)
         }.values()))
+
+    def __str__(self):
+        return self.to_str_log()
+    def __repr__(self):
+        return self.to_str_log()

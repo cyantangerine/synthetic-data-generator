@@ -449,7 +449,12 @@ class Metadata(BaseModel):
             f.write(self._dump_json())
 
     @classmethod
-    def loads(cls, attributes):
+    def loads(cls, attributes: Dict):
+        attributes = attributes.copy()
+        # attributes["primary_keys"] = set(attributes["primary_keys"])
+        # categorical_encoder
+        # continuous_encoder
+        # categorical_threshold
         return Metadata(**attributes)
 
     @classmethod

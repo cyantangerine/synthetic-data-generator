@@ -81,6 +81,7 @@ class Discriminator(Module):
 
     def forward(self, input_):
         """Apply the Discriminator to the `input_`."""
+        # TODO 这里有问题就是batchsize有问题
         assert input_.size()[0] % self.pac == 0
         return self.seq(input_.view(-1, self.pacdim))
 
