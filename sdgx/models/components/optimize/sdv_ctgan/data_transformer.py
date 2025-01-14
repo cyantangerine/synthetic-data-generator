@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, NamedTuple, Tuple, Type
 
+import concurrent
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
@@ -199,7 +200,9 @@ class DataTransformer(object):
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list: List[ColumnTransformInfo] = []
-        for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data", delay=3):
+        
+        # # 并行化处理
+        def process_column(column_name, data_loader, discrete_columns, logger):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
@@ -207,10 +210,36 @@ class DataTransformer(object):
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
-
-            self.output_info_list.append(column_transform_info.output_info)
-            self.output_dimensions += column_transform_info.output_dimensions
-            self._column_transform_info_list.append(column_transform_info)
+            return column_transform_info
+        
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     futures = {executor.submit(process_column, column_name, data_loader, discrete_columns, logger): column_name
+        #             for column_name in data_loader.columns()}
+            
+        #     for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Preparing data", delay=3):
+        #         column_transform_info = future.result()
+        #         self.output_info_list.append(column_transform_info.output_info)
+        #         self.output_dimensions += column_transform_info.output_dimensions
+        #         self._column_transform_info_list.append(column_transform_info)
+        if len(data_loader.columns()) > 100:
+            processes = []
+            for column_name in data_loader.columns():
+                process = delayed(process_column)(column_name, data_loader, discrete_columns, logger)
+                processes.append(process)
+            
+            p = Parallel(n_jobs=-1, return_as="generator")
+            for column_transform_info in tqdm.tqdm(
+                p(processes), desc="Preparing data", total=len(processes), delay=3
+            ):
+                self.output_info_list.append(column_transform_info.output_info)
+                self.output_dimensions += column_transform_info.output_dimensions
+                self._column_transform_info_list.append(column_transform_info)
+        else:
+            for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data", delay=3):
+                column_transform_info = process_column(column_name, data_loader, discrete_columns, logger)
+                self.output_info_list.append(column_transform_info.output_info)
+                self.output_dimensions += column_transform_info.output_dimensions
+                self._column_transform_info_list.append(column_transform_info)
         if USER_DEFINED_LOG_LEVEL == 'INFO' or USER_DEFINED_LOG_LEVEL == 'DEBUG':
             log_data = [item.to_str_log() for item in self._column_transform_info_list]
             logger.info(f"Transform fit result:\n" + '\n'.join(log_data))
