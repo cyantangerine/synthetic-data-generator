@@ -420,7 +420,7 @@ class Synthesizer:
             missing_count = missing_count - len(sample_data)
             psb.update(len(sample_data))
             max_trails -= 1
-
+        psb.close()
         return pd.concat(sample_data_list)[:count]
 
     def cleanup(self):

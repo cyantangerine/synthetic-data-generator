@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Set, Union
+from tqdm import autonotebook as tqdm
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -330,7 +331,7 @@ class Metadata(BaseModel):
             exclude_inspectors(list[str]): data type inspectors NOT used in this metadata (table).
             inspector_init_kwargs(dict): inspector args.
         """
-        logger.info("Inspecting metadata...")
+        logger.info("Initing metadata inspectors")
         im = InspectorManager()
         exclude_inspectors = exclude_inspectors or []
         exclude_inspectors.extend(
@@ -345,8 +346,10 @@ class Metadata(BaseModel):
         # set all inspectors not ready
         for inspector in inspectors:
             inspector.ready = False
-        for i, chunk in enumerate(dataloader.iter()):
-            for inspector in inspectors:
+        # TODO TODO 进度条不显示？
+        logger.info("Fitting metadata inspectors...")
+        for i, chunk in tqdm.tqdm(enumerate(dataloader.iter()), desc="Fitting metadata ", delay=3):
+            for inspector in tqdm.tqdm(inspectors, desc="Fitting metadata inspectors"):
                 if not inspector.ready:
                     inspector.fit(chunk)
             if all(i.ready for i in inspectors) or i > max_chunk:
@@ -356,7 +359,8 @@ class Metadata(BaseModel):
             primary_keys = set()
 
         metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
-        for inspector in inspectors:
+        logger.info("Inspecting metadata...")
+        for inspector in tqdm.tqdm(inspectors, desc="Metadata inspectors inspecting", delay=3):
             
             inspect_res = inspector.inspect()
             # update column type
