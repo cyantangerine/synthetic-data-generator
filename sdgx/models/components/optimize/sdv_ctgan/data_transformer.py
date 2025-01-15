@@ -344,15 +344,7 @@ class DataTransformer(object):
         Output uses the same type as input to the transform function.
         Either np array or pd dataframe.
         """
-
-        # TODO using pd.df.apply to increase performance.
-        st = 0
-        recovered_column_data_list = []
-        column_names = []
-
-        for column_transform_info in tqdm.tqdm(
-            self._column_transform_info_list, desc="Inverse transforming", delay=3
-        ):
+        def process_inv_transform(column_transform_info, st):
             dim = column_transform_info.output_dimensions
             column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
@@ -363,10 +355,35 @@ class DataTransformer(object):
                 recovered_column_data = self._inverse_transform_discrete(
                     column_transform_info, column_data
                 )
-            recovered_column_data_list.append(recovered_column_data)
-            column_names.append(column_transform_info.column_name)
-            st += dim
-
+            return dim, recovered_column_data
+        
+        
+        # TODO using pd.df.apply to increase performance.
+        st = 0
+        recovered_column_data_list = []
+        column_names = []
+        if len(self._column_transform_info_list) < 100:
+            for column_transform_info in tqdm.tqdm(
+                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            ):
+                dim, recovered_column_data = process_inv_transform(column_transform_info, st)  
+                recovered_column_data_list.append(recovered_column_data)
+                column_names.append(column_transform_info.column_name)
+                st += dim
+        else:
+            processes = []
+            for column_transform_info in self._column_transform_info_list:
+                process = delayed(process_inv_transform)(column_transform_info, st)
+                processes.append(process)
+                st += dim
+                
+            p = Parallel(n_jobs=-1, return_as="generator")
+            for dim, recovered_column_data in tqdm.tqdm(
+                p(processes), desc="Inverse transforming", delay=3
+            ):
+                recovered_column_data_list.append(recovered_column_data)
+                column_names.append(column_transform_info.column_name)
+                
         recovered_data = np.column_stack(recovered_column_data_list)
         recovered_data = pd.DataFrame(recovered_data, columns=column_names).astype(
             self._column_raw_dtypes
