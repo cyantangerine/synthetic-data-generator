@@ -81,7 +81,6 @@ class Discriminator(Module):
 
     def forward(self, input_):
         """Apply the Discriminator to the `input_`."""
-        # TODO 这里有问题就是batchsize有问题
         assert input_.size()[0] % self.pac == 0
         return self.seq(input_.view(-1, self.pacdim))
 
@@ -186,7 +185,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
         pac=10,
         device="cuda" if torch.cuda.is_available() else "cpu",
     ):
-        assert batch_size % 2 == 0
+        assert batch_size % pac == 0
         BatchedSynthesizer.__init__(self, batch_size=batch_size)
         self._embedding_dim = embedding_dim
         self._generator_dim = generator_dim
