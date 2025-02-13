@@ -107,4 +107,4 @@ class FixedCombinationInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("FixCombinationInspector", FixedCombinationInspector)
+    manager.register(FixedCombinationInspector, "FixedCombinationInspector")

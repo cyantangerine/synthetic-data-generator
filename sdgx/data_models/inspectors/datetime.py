@@ -129,4 +129,4 @@ class DatetimeInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("DatetimeInspector", DatetimeInspector)
+    manager.register(DatetimeInspector, "DatetimeInspector")

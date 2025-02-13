@@ -78,8 +78,6 @@ class NonValueTransformer(Transformer):
         Fit method for the transformer.
         """
 
-        logger.info("NonValueTransformer Fitted.")
-
         for key, value in kwargs.items():
             if key == "drop_na":
                 if not isinstance(value, str):
@@ -94,7 +92,7 @@ class NonValueTransformer(Transformer):
             if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
 
-        logger.info(f"NonValueTransformer get int columns: {self.int_columns}.")
+        # logger.info(f"NonValueTransformer get int columns: {self.int_columns}.")
 
         # float columns
         for each_col in metadata.float_columns:
@@ -103,13 +101,13 @@ class NonValueTransformer(Transformer):
             if metadata.get_column_data_type(each_col) == "float":
                 self.float_columns.add(each_col)
 
-        logger.info(f"NonValueTransformer get float columns: {self.float_columns}.")
+        # logger.info(f"NonValueTransformer get float columns: {self.float_columns}.")
 
         # get all column list
         self.column_list = metadata.column_list
 
-        logger.info(f"NonValueTransformer get column list from metadata: {self.column_list}.")
-
+        # logger.info(f"NonValueTransformer get column list from metadata: {self.column_list}.")
+        logger.info("NonValueTransformer Fitted.")
         self.fitted = True
 
     def convert(self, raw_data: DataFrame) -> DataFrame:
@@ -133,6 +131,9 @@ class NonValueTransformer(Transformer):
 
         # fill other non-numeric nan value
         for each_col in self.column_list:
+            if each_col not in res:
+                logger.warning(f"Column {each_col} not found in DataFrame, this may cause by other processors delete action.")
+                continue
             if each_col in self.int_columns or each_col in self.float_columns:
                 continue
             
@@ -183,4 +184,4 @@ class NonValueTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("NonValueTransformer", NonValueTransformer)
+    manager.register(NonValueTransformer, "NonValueTransformer")

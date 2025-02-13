@@ -36,4 +36,4 @@ class DiscreteInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("DiscreteInspector", DiscreteInspector)
+    manager.register(DiscreteInspector, "DiscreteInspector")

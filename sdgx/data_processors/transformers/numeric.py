@@ -192,4 +192,4 @@ class NumericValueTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("NumericValueTransformer", NumericValueTransformer)
+    manager.register(NumericValueTransformer, "NumericValueTransformer")

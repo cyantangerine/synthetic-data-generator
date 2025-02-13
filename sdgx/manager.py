@@ -88,12 +88,16 @@ class Manager(metaclass=Singleton):
             self.pm.register(importlib.import_module(p))
 
     def _normalize_name(self, name: str) -> str:
-        return name.strip().lower()
+        return name.strip()
 
-    def register(self, cls_name, cls: type):
+    def register(self, cls: type, cls_name=None):
         """
-        Register a new model, if the model is already registed, skip it.
+        Register a new model, if the model is already registered, skip it.
         """
+        if cls_name is None:
+            cls_name = cls.__name__
+        elif cls_name != cls.__name__:
+            logger.info(f"Warning: registering class {cls_name} is not equal to classname {cls.__name__}.")
 
         cls_name = self._normalize_name(cls_name)
         logger.debug(f"Register for new model: {cls_name}")

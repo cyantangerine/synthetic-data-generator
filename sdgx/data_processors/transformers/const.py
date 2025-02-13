@@ -111,4 +111,4 @@ class ConstValueTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("ConstValueTransformer", ConstValueTransformer)
+    manager.register(ConstValueTransformer, "ConstValueTransformer")

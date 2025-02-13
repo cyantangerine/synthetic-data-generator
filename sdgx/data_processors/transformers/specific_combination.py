@@ -136,4 +136,4 @@ class SpecificCombinationTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("SpecificCombinationTransformer", SpecificCombinationTransformer)
+    manager.register(SpecificCombinationTransformer, "SpecificCombinationTransformer")

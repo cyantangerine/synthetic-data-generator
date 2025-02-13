@@ -34,6 +34,8 @@ class InspectorManager(Manager):
         **kwargs: Any,
     ) -> list[Inspector]:
         includes = includes or self.registed_inspectors.keys()
+        includes = [i if isinstance(i, str) else i.__name__ for i in includes]
+        excludes = [i if isinstance(i, str) else i.__name__ for i in excludes]
         if excludes:
             includes = list(set(includes) - set(excludes))
         return [self.init(inspector_name, **kwargs) for inspector_name in includes]

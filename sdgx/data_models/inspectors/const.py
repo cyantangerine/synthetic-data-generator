@@ -67,4 +67,4 @@ class ConstInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("ConstInspector", ConstInspector)
+    manager.register(ConstInspector, "ConstInspector")

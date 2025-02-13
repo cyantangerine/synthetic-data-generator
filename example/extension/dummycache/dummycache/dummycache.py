@@ -11,4 +11,4 @@ from sdgx.cachers.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("DummyCache", MyOwnCache)
+    manager.register(MyOwnCache, "DummyCache")

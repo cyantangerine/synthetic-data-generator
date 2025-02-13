@@ -102,4 +102,4 @@ class ChnPiiGenerator(PIIGenerator):
 
 @hookimpl
 def register(manager):
-    manager.register("chnpiigenerator", ChnPiiGenerator)
+    manager.register(ChnPiiGenerator, "ChnPiiGenerator")

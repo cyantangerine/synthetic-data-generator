@@ -11,4 +11,4 @@ from sdgx.models.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("DummyModel", MyOwnModel)
+    manager.register(MyOwnModel, "DummyModel")

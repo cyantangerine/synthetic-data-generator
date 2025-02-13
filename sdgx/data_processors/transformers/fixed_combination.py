@@ -259,4 +259,4 @@ class FixedCombinationTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("FixedCombinationTransformer", FixedCombinationTransformer)
+    manager.register(FixedCombinationTransformer, "FixedCombinationTransformer")

@@ -73,4 +73,4 @@ class EmptyInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("EmptyInspector", EmptyInspector)
+    manager.register(EmptyInspector, "EmptyInspector")

@@ -5,6 +5,7 @@ from typing import Any
 from sdgx import data_processors
 from sdgx.data_processors import extension
 from sdgx.data_processors.base import DataProcessor
+from sdgx.data_processors.executor import DataProcessorExecutor
 from sdgx.data_processors.extension import project_name as PROJECT_NAME
 from sdgx.manager import Manager
 
@@ -43,23 +44,19 @@ class DataProcessorManager(Manager):
     The hook specifications model from the extension module.
     """
 
-    preset_defalut_processors = [
-        p.lower()
-        for p in [
-            "SpecificCombinationTransformer",
-            "FixedCombinationTransformer",
-            "NonValueTransformer",
-            "OutlierTransformer",
-            "EmailGenerator",
-            "ChnPiiGenerator",
-            "IntValueFormatter",
-            "DatetimeFormatter",
-        ]
-    ] + [
-        "ConstValueTransformer".lower(),
-        "PositiveNegativeFilter".lower(),
-        "EmptyTransformer".lower(),
-        "ColumnOrderTransformer".lower(),
+    preset_default_processors = [
+        "SpecificCombinationTransformer",
+        "FixedCombinationTransformer",
+        "NonValueTransformer",
+        "OutlierTransformer",
+        "EmailGenerator",
+        "ChnPiiGenerator",
+        # "IntValueFormatter",
+        "DatetimeFormatter",
+        "ConstValueTransformer",
+        "PositiveNegativeFilter",
+        "EmptyTransformer",
+        "ColumnOrderTransformer",
     ]
     """
     preset_defalut_processors list stores the lowercase names of the transformers loaded by default. When using the synthesizer, they will be loaded by default to facilitate user operations.
@@ -86,7 +83,7 @@ class DataProcessorManager(Manager):
 
         # calculate the target_processors
         default_processors = []
-        for each_processor in self.preset_defalut_processors:
+        for each_processor in self.preset_default_processors:
             if each_processor in registed_processor_list:
                 default_processors.append(each_processor)
 
@@ -106,7 +103,12 @@ class DataProcessorManager(Manager):
         """
         Initializes a data processor with the given name and parameters
         """
-        return self.init(processor_name, **kwargs)
+        if isinstance(processor_name, str):
+            return self.init(processor_name, **kwargs)
+        elif isinstance(processor_name, DataProcessor):
+            return processor_name
+        else:
+            raise ValueError(f"Invalid processor type {processor_name}")
 
     def init_all_processors(self, **kwargs: Any) -> list[DataProcessor]:
         """
@@ -126,3 +128,6 @@ class DataProcessorManager(Manager):
             self.init(processor_name, **kwargs)
             for processor_name in self.registed_default_processor_list
         ]
+
+    def init_default_processors_and_executor(self, **kwargs: Any) -> DataProcessorExecutor:
+        return DataProcessorExecutor(self.init_default_processors(**kwargs))

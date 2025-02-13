@@ -11,4 +11,4 @@ from sdgx.data_exporters.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("MyOwnExporter", MyOwnExporter)
+    manager.register(MyOwnExporter, "MyOwnExporter")

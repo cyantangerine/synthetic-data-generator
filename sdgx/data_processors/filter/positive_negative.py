@@ -112,4 +112,4 @@ class PositiveNegativeFilter(Filter):
 
 @hookimpl
 def register(manager):
-    manager.register("PositiveNegativeFilter", PositiveNegativeFilter)
+    manager.register(PositiveNegativeFilter, "PositiveNegativeFilter")

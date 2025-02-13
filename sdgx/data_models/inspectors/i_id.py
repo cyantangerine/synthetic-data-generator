@@ -50,4 +50,4 @@ class IDInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("IDInspector", IDInspector)
+    manager.register(IDInspector, "IDInspector")

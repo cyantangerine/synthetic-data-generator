@@ -104,4 +104,4 @@ class EmptyTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("EmptyTransformer", EmptyTransformer)
+    manager.register(EmptyTransformer, "EmptyTransformer")

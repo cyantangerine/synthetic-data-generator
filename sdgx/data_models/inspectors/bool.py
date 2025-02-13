@@ -37,4 +37,4 @@ class BoolInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("BoolInspector", BoolInspector)
+    manager.register(BoolInspector, "BoolInspector")

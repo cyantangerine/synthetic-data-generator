@@ -67,4 +67,4 @@ class SubsetRelationshipInspector(RelationshipInspector):
 
 @hookimpl
 def register(manager):
-    manager.register("SubsetRelationshipInspector", SubsetRelationshipInspector)
+    manager.register(SubsetRelationshipInspector, "SubsetRelationshipInspector")

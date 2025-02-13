@@ -9,4 +9,4 @@ class MyOwnInspector(Inspector): ...
 
 @hookimpl
 def register(manager):
-    manager.register("DummyInspector", MyOwnInspector)
+    manager.register(MyOwnInspector, "DummyInspector")

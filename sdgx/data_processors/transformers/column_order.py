@@ -87,4 +87,4 @@ class ColumnOrderTransformer(Transformer):
 
 @hookimpl
 def register(manager):
-    manager.register("ColumnOrderTransformer", ColumnOrderTransformer)
+    manager.register(ColumnOrderTransformer, "ColumnOrderTransformer")

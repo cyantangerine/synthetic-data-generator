@@ -186,7 +186,7 @@ class DatetimeFormatter(Formatter):
 
         logger.info("Data reverse-converting by DatetimeFormatter...")
 
-        logger.info(f"parameters : {self.datetime_columns}, {self.datetime_formats}")
+        logger.debug(f"parameters : {self.datetime_columns}, {self.datetime_formats}")
 
         result_data = self.convert_timestamp_to_datetime(
             self.datetime_columns, self.datetime_formats, processed_data
@@ -262,4 +262,4 @@ class DatetimeFormatter(Formatter):
 
 @hookimpl
 def register(manager):
-    manager.register("DatetimeFormatter", DatetimeFormatter)
+    manager.register(DatetimeFormatter, "DatetimeFormatter")

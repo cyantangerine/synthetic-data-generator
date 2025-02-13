@@ -69,4 +69,4 @@ class EmailGenerator(PIIGenerator):
 
 @hookimpl
 def register(manager):
-    manager.register("EmailGenerator", EmailGenerator)
+    manager.register(EmailGenerator, "EmailGenerator")

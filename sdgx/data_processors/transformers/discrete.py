@@ -5,9 +5,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
-from sdgx.data_processors.extension import hookimpl
 from sdgx.data_processors.transformers.base import Transformer
-from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.utils import logger
 
 

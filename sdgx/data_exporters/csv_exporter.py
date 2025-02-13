@@ -38,4 +38,4 @@ from sdgx.data_exporters.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("CsvExporter", CsvExporter)
+    manager.register(CsvExporter, "CsvExporter")

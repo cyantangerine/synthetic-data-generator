@@ -11,4 +11,4 @@ from sdgx.data_processors.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("DummyDataProcessor", MyOwnDataProcessor)
+    manager.register(MyOwnDataProcessor, "DummyDataProcessor")

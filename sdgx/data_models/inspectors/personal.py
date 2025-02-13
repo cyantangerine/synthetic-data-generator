@@ -196,20 +196,20 @@ class ChineseCompanyNameInspector(RegexInspector):
 
 @hookimpl
 def register(manager):
-    manager.register("EmailInspector", EmailInspector)
+    manager.register(EmailInspector, "EmailInspector")
 
-    manager.register("ChinaMainlandIDInspector", ChinaMainlandIDInspector)
+    manager.register(ChinaMainlandIDInspector, "ChinaMainlandIDInspector")
 
-    manager.register("ChinaMainlandMobilePhoneInspector", ChinaMainlandMobilePhoneInspector)
+    manager.register(ChinaMainlandMobilePhoneInspector, "ChinaMainlandMobilePhoneInspector")
 
-    manager.register("ChinaMainlandPostCode", ChinaMainlandPostCode)
+    manager.register(ChinaMainlandPostCode, "ChinaMainlandPostCode")
 
-    manager.register("ChinaMainlandUnifiedSocialCreditCode", ChinaMainlandUnifiedSocialCreditCode)
+    manager.register(ChinaMainlandUnifiedSocialCreditCode, "ChinaMainlandUnifiedSocialCreditCode")
 
-    manager.register("ChinaMainlandAddressInspector", ChinaMainlandAddressInspector)
+    manager.register(ChinaMainlandAddressInspector, "ChinaMainlandAddressInspector")
 
-    manager.register("ChineseNameInspector", ChineseNameInspector)
+    manager.register(ChineseNameInspector, "ChineseNameInspector")
 
-    manager.register("EnglishNameInspector", EnglishNameInspector)
+    manager.register(EnglishNameInspector, "EnglishNameInspector")
 
-    manager.register("ChineseCompanyNameInspector", ChineseCompanyNameInspector)
+    manager.register(ChineseCompanyNameInspector, "ChineseCompanyNameInspector")

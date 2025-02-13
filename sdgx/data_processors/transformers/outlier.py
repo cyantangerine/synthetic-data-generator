@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -43,9 +44,9 @@ class OutlierTransformer(Transformer):
 
     def __init__(self):
         self.int_columns = set()
-        self.int_outlier_fill_value = 0
+        self.int_outlier_fill_value = np.nan
         self.float_columns = set()
-        self.float_outlier_fill_value = float(0)
+        self.float_outlier_fill_value = np.nan
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -136,4 +137,4 @@ def register(manager):
     Args:
         manager: The manager object responsible for registering transformers.
     """
-    manager.register("OutlierTransformer", OutlierTransformer)
+    manager.register(OutlierTransformer, "OutlierTransformer")

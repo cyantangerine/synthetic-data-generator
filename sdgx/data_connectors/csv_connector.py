@@ -93,4 +93,4 @@ from sdgx.data_connectors.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("CsvConnector", CsvConnector)
+    manager.register(CsvConnector, "CsvConnector")

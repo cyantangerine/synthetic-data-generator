@@ -343,6 +343,7 @@ class Metadata(BaseModel):
         inspectors = im.init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )
+        logger.info(f"Using metadata inspectors: {[i.__class__.__name__ for i in inspectors]}")
         # set all inspectors not ready
         for inspector in inspectors:
             inspector.ready = False
@@ -704,3 +705,14 @@ class Metadata(BaseModel):
         for attr in ["column_list", "primary_keys", "categorical_encoder"]:
             do_remove_columns(attr, False)
         self.check()
+
+    def to_json(self):
+        def custom_encoder(obj):
+            if isinstance(obj, set):
+                return list(obj)  # Convert set to list
+            if isinstance(obj, StrValuedBaseEnum):
+                return obj.value
+            raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+        meta_dict = self.dump()
+        return json.dumps(meta_dict, default=custom_encoder)
+

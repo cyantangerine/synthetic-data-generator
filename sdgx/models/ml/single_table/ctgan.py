@@ -596,4 +596,4 @@ class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
 
 @hookimpl
 def register(manager):
-    manager.register("CTGAN", CTGANSynthesizerModel)
+    manager.register(CTGANSynthesizerModel, "CTGAN")

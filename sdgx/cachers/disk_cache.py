@@ -147,4 +147,4 @@ class DiskCache(Cacher):
 
 @hookimpl
 def register(manager):
-    manager.register("DiskCache", DiskCache)
+    manager.register(DiskCache, "DiskCache")

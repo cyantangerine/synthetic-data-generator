@@ -11,4 +11,4 @@ from sdgx.data_connectors.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("DummyDataConnector", MyOwnDataConnector)
+    manager.register(MyOwnDataConnector, "DummyDataConnector")

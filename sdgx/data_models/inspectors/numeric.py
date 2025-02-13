@@ -208,4 +208,4 @@ class NumericInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("NumericInspector", NumericInspector)
+    manager.register(NumericInspector, "NumericInspector")

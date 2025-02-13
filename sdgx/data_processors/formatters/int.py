@@ -73,4 +73,4 @@ class IntValueFormatter(Formatter):
 
 @hookimpl
 def register(manager):
-    manager.register("IntValueFormatter", IntValueFormatter)
+    manager.register(IntValueFormatter, "IntValueFormatter")

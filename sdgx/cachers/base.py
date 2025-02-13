@@ -103,4 +103,4 @@ class NoCache(Cacher):
 
 @hookimpl
 def register(manager):
-    manager.register("NoCache", NoCache)
+    manager.register(NoCache, "NoCache")
