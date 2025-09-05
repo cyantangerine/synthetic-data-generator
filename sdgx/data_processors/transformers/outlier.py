@@ -44,7 +44,7 @@ class OutlierTransformer(Transformer):
 
     def __init__(self):
         self.int_columns = set()
-        self.int_outlier_fill_value = np.nan
+        self.int_outlier_fill_value = None
         self.float_columns = set()
         self.float_outlier_fill_value = np.nan
 

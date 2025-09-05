@@ -31,7 +31,7 @@ DEFAULT_ORDER_MAP = {
     "DatetimeFormatter": 20,
 
     "OutlierTransformer": 30,
-    "IntValueFormatter": 30,  # Not Need if Outlier Used
+    "IntValueFormatter": 31,  # Not Need if Outlier Used ?
 
     "NonValueTransformer": 40,
 
@@ -67,8 +67,8 @@ class DataProcessorExecutor:
             else:
                 raise ValueError("Item of data_processors must be of type DataProcessor")
 
-        if get_cls_name(IntValueFormatter) in processors_type_index and get_cls_name(OutlierTransformer) in processors_type_index:
-            raise ValueError("IntValueFormatter is not needed if OutlierTransformer is using.")
+        # if get_cls_name(IntValueFormatter) in processors_type_index and get_cls_name(OutlierTransformer) in processors_type_index:
+        #     raise ValueError("IntValueFormatter is not needed if OutlierTransformer is using.")
 
         order_list = []
 

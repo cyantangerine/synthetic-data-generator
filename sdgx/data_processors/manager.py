@@ -51,7 +51,7 @@ class DataProcessorManager(Manager):
         "OutlierTransformer",
         "EmailGenerator",
         "ChnPiiGenerator",
-        # "IntValueFormatter",
+        "IntValueFormatter",
         "DatetimeFormatter",
         "ConstValueTransformer",
         "PositiveNegativeFilter",
@@ -78,7 +78,7 @@ class DataProcessorManager(Manager):
         """
         registed_processor_list = self.registed_data_processors.keys()
 
-        # we donot use the code next line to calculate processor intersection, to ensure the oder of processors not changed.
+        # we do not use the code next line to calculate processor intersection, to ensure the order of processors not changed.
         # target_processors = list(set(registed_processor_list).intersection(self.preset_defalut_processors))
 
         # calculate the target_processors

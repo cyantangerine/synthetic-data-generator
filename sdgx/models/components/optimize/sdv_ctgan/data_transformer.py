@@ -387,9 +387,13 @@ class DataTransformer(object):
                 recovered_column_data_list.append(recovered_column_data)
                 
         recovered_data = np.column_stack(recovered_column_data_list)
-        recovered_data = pd.DataFrame(recovered_data, columns=column_names).astype(
-            self._column_raw_dtypes
-        )
+        recovered_data = pd.DataFrame(recovered_data, columns=column_names)
+        try:
+            recovered_data = recovered_data.astype(
+                self._column_raw_dtypes
+            )
+        except ValueError as e:
+            logger.warning(e)
         if not self.dataframe:
             recovered_data = recovered_data.to_numpy()
         return recovered_data
