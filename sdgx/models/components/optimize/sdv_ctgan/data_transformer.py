@@ -202,13 +202,15 @@ class DataTransformer(object):
         self._column_transform_info_list: List[ColumnTransformInfo] = []
         
         # # 并行化处理
-        def process_column(column_name, data_loader, discrete_columns, logger):
+        def process_column(column_name, data_loader, discrete_columns, _logger=None):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
-                logger.debug(f"Fitting discrete column {column_name}...")
+                if _logger:
+                    _logger.debug(f"Fitting discrete column{column_name}...")
                 column_transform_info = self._fit_discrete(data_loader[[column_name]])
             else:
-                logger.debug(f"Fitting continuous column {column_name}...")
+                if _logger:
+                    _logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
             return column_transform_info
         
@@ -224,7 +226,7 @@ class DataTransformer(object):
         if len(data_loader.columns()) > 100:
             processes = []
             for column_name in data_loader.columns():
-                process = delayed(process_column)(column_name, data_loader, discrete_columns, logger)
+                process = delayed(process_column)(column_name, data_loader, discrete_columns)
                 processes.append(process)
             
             p = Parallel(n_jobs=-1, return_as="generator")
@@ -380,7 +382,7 @@ class DataTransformer(object):
                 processes.append(process)
                 st += dim
                 
-            p = Parallel(n_jobs=-1, return_as="generator")
+            p = Parallel(n_jobs=-1, return_as="generator", prefer="threads")
             for recovered_column_data in tqdm.tqdm(
                 p(processes), desc="Inverse transforming", delay=3, total=len(processes)
             ):
