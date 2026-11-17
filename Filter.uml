@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>sdgx.data_processors.filter.base.Filter</OriginalElement>
+  <nodes>
+    <node x="385.0" y="57.0">sdgx.data_processors.samplers.base.Sampler</node>
+    <node x="-260.0" y="781.0">sdgx.data_processors.transformers.fixed_combination.FixedCombinationTransformer</node>
+    <node x="-300.0" y="919.0">sdgx.data_processors.transformers.base.Transformer</node>
+    <node x="-260.0" y="461.0">sdgx.data_processors.transformers.nan.NonValueTransformer</node>
+    <node x="-260.0" y="-17.0">sdgx.data_processors.filter.positive_negative.PositiveNegativeFilter</node>
+    <node x="-380.0" y="1067.0">object</node>
+    <node x="-260.0" y="845.0">sdgx.data_processors.transformers.specific_combination.SpecificCombinationTransformer</node>
+    <node x="-260.0" y="717.0">sdgx.data_processors.transformers.column_order.ColumnOrderTransformer</node>
+    <node x="359.0" y="131.0">sdgx.data_processors.formatters.int.IntValueFormatter</node>
+    <node x="-260.0" y="589.0">sdgx.data_processors.transformers.const.ConstValueTransformer</node>
+    <node x="-260.0" y="333.0">sdgx.data_processors.transformers.empty.EmptyTransformer</node>
+    <node x="359.0" y="195.0">sdgx.data_processors.formatters.datetime.DatetimeFormatter</node>
+    <node x="-220.0" y="121.0">sdgx.data_processors.generators.email.EmailGenerator</node>
+    <node x="-300.0" y="269.0">sdgx.data_processors.generators.base.Generator</node>
+    <node x="-260.0" y="397.0">sdgx.data_processors.transformers.outlier.OutlierTransformer</node>
+    <node x="-340.0" y="993.0">sdgx.data_processors.base.DataProcessor</node>
+    <node x="-260.0" y="525.0">sdgx.data_processors.transformers.discrete.DiscreteTransformer</node>
+    <node x="-260.0" y="653.0">sdgx.data_processors.transformers.numeric.NumericValueTransformer</node>
+    <node x="-300.0" y="57.0">sdgx.data_processors.filter.base.Filter</node>
+    <node x="-420.0" y="1141.0">typing.Hashable</node>
+    <node x="-260.0" y="195.0">sdgx.data_processors.generators.pii.PIIGenerator</node>
+    <node x="319.0" y="269.0">sdgx.data_processors.formatters.base.Formatter</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="sdgx.data_processors.formatters.base.Formatter" target="sdgx.data_processors.base.DataProcessor" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="554.5" y="323.0" />
+      <point x="-335.0" y="323.0" />
+      <point x="-335.0" y="973.0" />
+      <point x="-201.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.formatters.int.IntValueFormatter" target="sdgx.data_processors.formatters.base.Formatter" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="621.5" y="185.0" />
+      <point x="324.0" y="185.0" />
+      <point x="324.0" y="249.0" />
+      <point x="-230.5" y="-0.0" />
+    </edge>
+    <edge source="object" target="typing.Hashable" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-330.5" y="1121.0" />
+      <point x="-415.0" y="1121.0" />
+      <point x="-88.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.generators.email.EmailGenerator" target="sdgx.data_processors.generators.pii.PIIGenerator" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="44.5" y="175.0" />
+      <point x="-255.0" y="175.0" />
+      <point x="-234.0" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.samplers.base.Sampler" target="sdgx.data_processors.base.DataProcessor" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="605.5" y="111.0" />
+      <point x="-335.0" y="111.0" />
+      <point x="-335.0" y="973.0" />
+      <point x="-201.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.base.DataProcessor" target="object" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-133.5" y="1047.0" />
+      <point x="-375.0" y="1047.0" />
+      <point x="-44.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.empty.EmptyTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="32.0" y="387.0" />
+      <point x="-295.0" y="387.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.base.Transformer" target="sdgx.data_processors.base.DataProcessor" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-43.5" y="973.0" />
+      <point x="-335.0" y="973.0" />
+      <point x="-201.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.nan.NonValueTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="36.0" y="515.0" />
+      <point x="-295.0" y="515.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.outlier.OutlierTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="34.5" y="451.0" />
+      <point x="-295.0" y="451.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.generators.base.Generator" target="sdgx.data_processors.base.DataProcessor" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-62.0" y="323.0" />
+      <point x="-335.0" y="323.0" />
+      <point x="-335.0" y="973.0" />
+      <point x="-201.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.formatters.datetime.DatetimeFormatter" target="sdgx.data_processors.formatters.base.Formatter" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="653.5" y="249.0" />
+      <point x="324.0" y="249.0" />
+      <point x="-230.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.generators.pii.PIIGenerator" target="sdgx.data_processors.generators.base.Generator" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-21.0" y="249.0" />
+      <point x="-295.0" y="249.0" />
+      <point x="-233.0" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.filter.positive_negative.PositiveNegativeFilter" target="sdgx.data_processors.filter.base.Filter" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="57.5" y="37.0" />
+      <point x="-295.0" y="37.0" />
+      <point x="-182.0" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.column_order.ColumnOrderTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="98.5" y="771.0" />
+      <point x="-295.0" y="771.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.discrete.DiscreteTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="46.5" y="579.0" />
+      <point x="-295.0" y="579.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.fixed_combination.FixedCombinationTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="138.0" y="835.0" />
+      <point x="-295.0" y="835.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.filter.base.Filter" target="sdgx.data_processors.base.DataProcessor" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="-113.0" y="111.0" />
+      <point x="-335.0" y="111.0" />
+      <point x="-335.0" y="973.0" />
+      <point x="-201.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.specific_combination.SpecificCombinationTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="160.0" y="899.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.numeric.NumericValueTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="74.5" y="707.0" />
+      <point x="-295.0" y="707.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+    <edge source="sdgx.data_processors.transformers.const.ConstValueTransformer" target="sdgx.data_processors.transformers.base.Transformer" relationship="REALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="50.0" y="643.0" />
+      <point x="-295.0" y="643.0" />
+      <point x="-295.0" y="899.0" />
+      <point x="-251.5" y="-0.0" />
+    </edge>
+  </edges>
+  <settings layout="紧凑" zoom="0.6501650165016502" showDependencies="false" x="537.0101522842637" y="565.9289340101525" />
+  <SelectedNodes>
+    <node>sdgx.data_processors.filter.base.Filter</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>内部类</Category>
+  </Categories>
+</Diagram>
+
